@@ -152,11 +152,7 @@ class DeviceScreenshotHandler(BaseHandler):
 
 class MainHandler(BaseHandler):
     def get(self):
-        self.write("Hello")
-        # self.render('index.html')
-
-    def post(self):
-        self.write("Good")
+        self.render("index.html")
 
 
 class BuildWSHandler(tornado.websocket.WebSocketHandler):
@@ -358,13 +354,12 @@ def consume_queue():
             yield gen.sleep(.5)
 
 
-def run_web(debug=False):
+def run_web(debug=False, port=17310):
     application = make_app({
         'static_path': os.path.join(__dir__, 'static'),
-        'template_path': os.path.join(__dir__, 'static'),
+        'template_path': os.path.join(__dir__, 'templates'),
         'debug': debug,
     })
-    port = 17310
     print('listen port', port)
     signal.signal(signal.SIGINT, signal_handler)
     application.listen(port)
@@ -373,56 +368,57 @@ def run_web(debug=False):
     tornado.ioloop.IOLoop.instance().start()
 
 
-def create_shortcut():
-    import os
-    import sys
-    if os.name != 'nt':
-        sys.exit("Only valid in Windows")
-
-    import pythoncom
-    from win32com.shell import shell
-    from win32com.shell import shellcon
-    # Refs
-    # - https://github.com/pearu/iocbio/blob/master/installer/utils.py
-    # - https://blog.csdn.net/thundor/article/details/5968581
-    ilist = shell.SHGetSpecialFolderLocation(0, shellcon.CSIDL_DESKTOP)
-    dtpath = shell.SHGetPathFromIDList(ilist).decode('utf-8')
-
-    shortcut = pythoncom.CoCreateInstance(
-        shell.CLSID_ShellLink, None,
-        pythoncom.CLSCTX_INPROC_SERVER, shell.IID_IShellLink)
-    launch_path = sys.executable
-    shortcut.SetPath(launch_path)
-    shortcut.SetArguments("-m weditor")
-    shortcut.SetDescription(launch_path)
-    shortcut.SetIconLocation(sys.executable, 0)
-    shortcut.QueryInterface(
-        pythoncom.IID_IPersistFile).Save(dtpath + "\\WEditor.lnk", 0)
-    print("Shortcut created. " + dtpath + "\\WEditor.lnk")
+# def create_shortcut():
+#     import os
+#     import sys
+#     if os.name != 'nt':
+#         sys.exit("Only valid in Windows")
+#
+#     import pythoncom
+#     from win32com.shell import shell
+#     from win32com.shell import shellcon
+#     # Refs
+#     # - https://github.com/pearu/iocbio/blob/master/installer/utils.py
+#     # - https://blog.csdn.net/thundor/article/details/5968581
+#     ilist = shell.SHGetSpecialFolderLocation(0, shellcon.CSIDL_DESKTOP)
+#     dtpath = shell.SHGetPathFromIDList(ilist).decode('utf-8')
+#
+#     shortcut = pythoncom.CoCreateInstance(
+#         shell.CLSID_ShellLink, None,
+#         pythoncom.CLSCTX_INPROC_SERVER, shell.IID_IShellLink)
+#     launch_path = sys.executable
+#     shortcut.SetPath(launch_path)
+#     shortcut.SetArguments("-m weditor")
+#     shortcut.SetDescription(launch_path)
+#     shortcut.SetIconLocation(sys.executable, 0)
+#     shortcut.QueryInterface(
+#         pythoncom.IID_IPersistFile).Save(dtpath + "\\WEditor.lnk", 0)
+#     print("Shortcut created. " + dtpath + "\\WEditor.lnk")
 
 
 def main():
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     ap.add_argument('-q', '--quiet', action='store_true',
                     help='quite mode, no open new browser')
     ap.add_argument('--debug', action='store_true',
                     help='open debug mode')
     ap.add_argument('--shortcut', action='store_true',
                     help='create shortcut in desktop')
-    ap.add_argument('port', nargs='?', default=17310,
+    ap.add_argument('-p', '--port', type=int, default=17310,
                     help='local listen port for weditor')
 
     args = ap.parse_args()
-    if args.shortcut:
-        create_shortcut()
-        return
+    # if args.shortcut:
+    #     create_shortcut()
+    #     return
 
     open_browser = not args.quiet
 
     if open_browser:
         # webbrowser.open(url, new=2)
-        webbrowser.open('http://atx.open.netease.com', new=2)
-    run_web(args.debug)
+        webbrowser.open('http://localhost:'+str(args.port), new=2)
+    run_web(args.debug, args.port)
 
 
 if __name__ == '__main__':
