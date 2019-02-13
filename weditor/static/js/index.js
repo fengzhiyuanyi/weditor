@@ -790,7 +790,12 @@ new Vue({
         if (['Layout'].includes(node.type)) {
           return;
         }
-        self.drawNode(node, 'black', true);
+        if (node.text !== null && node.text !== ''){
+          self.drawNode(node, 'black', false);
+        }
+        // else {
+        //   self.drawNode(node, 'black', true);
+        // }
       })
     },
     drawHoverNode: function (pos) {

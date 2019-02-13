@@ -181,6 +181,18 @@
                 <td v-text="elem.visible"></td>
               </tr>
               <tr>
+                <td>zorder</td>
+                <td contenteditable v-text="elem.zorder"></td>
+              </tr>
+              <tr>
+                <td>rect</td>
+                <td contenteditable v-text="elem.rect"></td>
+              </tr>
+              <tr v-if="elem.fontsize">
+                <td>fontsize</td>
+                <td contenteditable v-text="elem.fontsize"></td>
+              </tr>
+              <tr>
                 <td>xpath(beta)</td>
                 <td contenteditable v-text="elemXpath"></td>
               </tr>

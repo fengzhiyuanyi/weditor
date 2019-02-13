@@ -415,9 +415,9 @@ def main():
 
     open_browser = not args.quiet
 
-    if open_browser:
-        # webbrowser.open(url, new=2)
-        webbrowser.open('http://localhost:'+str(args.port), new=2)
+    # if open_browser:
+    #     # webbrowser.open(url, new=2)
+    #     webbrowser.open('http://localhost:'+str(args.port), new=2)
     run_web(args.debug, args.port)
 
 
